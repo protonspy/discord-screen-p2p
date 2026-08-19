@@ -176,11 +176,11 @@ function sample() {
       ? {
           receivedBytesPerSecond: Math.max(
             0,
-            (network.receivedBytes - previousNetwork.receivedBytes) / elapsedSeconds
+            (network.receivedBytes - previousNetwork.receivedBytes) / elapsedSeconds,
           ),
           transmittedBytesPerSecond: Math.max(
             0,
-            (network.transmittedBytes - previousNetwork.transmittedBytes) / elapsedSeconds
+            (network.transmittedBytes - previousNetwork.transmittedBytes) / elapsedSeconds,
           ),
         }
       : { receivedBytesPerSecond: null, transmittedBytesPerSecond: null };

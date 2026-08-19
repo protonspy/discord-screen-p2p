@@ -197,7 +197,9 @@ export function createRoom({
     return { error: 'Limite de salas abertas atingido. Feche uma antes de criar outra.' };
   }
 
-  const escolhido = String(name ?? '').replace(/\s+/g, ' ').trim();
+  const escolhido = String(name ?? '')
+    .replace(/\s+/g, ' ')
+    .trim();
   // Nome é opcional: sem ele, um baseado em quem criou.
   const clean = (escolhido || `Sala de ${ownerName}`).slice(0, MAX_ROOM_NAME);
 
