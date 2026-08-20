@@ -45,7 +45,7 @@ function conferirRitmo({ fps, seconds }) {
   setStatus(
     `Seu computador está entregando ~${fps} dos ${alvo} quadros pedidos. ` +
       'Para uma imagem mais estável, pare e escolha uma taxa menor.',
-    'aviso'
+    'aviso',
   );
 }
 
@@ -165,7 +165,7 @@ async function start() {
     audio: $('withAudio').checked,
     onStatus: (s) =>
       setStatus(
-        `Codec: ${s.codec} · ${s.width}×${s.height} · captura ${s.direct ? 'direta' : 'via <video>'}`
+        `Codec: ${s.codec} · ${s.width}×${s.height} · captura ${s.direct ? 'direta' : 'via <video>'}`,
       ),
     onStats: (s) => {
       $('viewers').textContent = s.viewers;
@@ -195,7 +195,9 @@ async function start() {
     store(BROADCAST_FPS_KEY, $('fps').value);
     store(BROADCAST_BITRATE_KEY, $('quality').value);
     $('preview').srcObject = stream;
-    $('preview').play().catch(() => {});
+    $('preview')
+      .play()
+      .catch(() => {});
     $('setup').hidden = true;
     $('live').hidden = false;
   } catch (err) {
@@ -203,7 +205,7 @@ async function start() {
     $('start').disabled = false;
     setStatus(
       err.name === 'NotAllowedError' ? 'Você cancelou a seleção de tela.' : err.message,
-      'error'
+      'error',
     );
   }
 }

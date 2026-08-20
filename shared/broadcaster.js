@@ -71,7 +71,6 @@ export function supportError({ requireChromium = false } = {}) {
  * @param {(stats:object)=>void} [opts.onStats]  viewers, fps, mbps, segundos no ar
  * @param {(reason:string)=>void} [opts.onEnd]   encerrou (por qualquer motivo)
  * @param {(msg:string)=>void} [opts.onAviso]    algo mudou sem ser erro
- * @param {(msg:string)=>void} [opts.onError]
  */
 export function createBroadcaster({
   wsUrl,
@@ -81,7 +80,6 @@ export function createBroadcaster({
   onStatus,
   onStats,
   onEnd,
-  onError,
   onAviso,
 }) {
   let ws = null;
@@ -289,7 +287,8 @@ export function createBroadcaster({
     if (superficie === 'window' && !somDeJanelaConfiavel()) {
       return (
         'Este navegador não isola o som por janela, e o som do computador traria o Discord ' +
-        'junto. Transmitindo sem som.' + saida
+        'junto. Transmitindo sem som.' +
+        saida
       );
     }
     if (superficie === 'monitor') {
@@ -298,7 +297,9 @@ export function createBroadcaster({
         : '';
       return (
         'A tela inteira carrega o som do Discord junto, e a call se ouviria em eco. ' +
-        'Transmitindo sem som.' + comoLevar + saida
+        'Transmitindo sem som.' +
+        comoLevar +
+        saida
       );
     }
     if (tinhaFaixa) {
@@ -319,7 +320,7 @@ export function createBroadcaster({
   async function trocarSom() {
     // Precisa vir do gesto do usuário, como qualquer getDisplayMedia.
     const escolha = await navigator.mediaDevices.getDisplayMedia(
-      opcoesCaptura({ video: true, comSom: true })
+      opcoesCaptura({ video: true, comSom: true }),
     );
 
     const faixa = escolha.getAudioTracks()[0];
@@ -333,7 +334,7 @@ export function createBroadcaster({
       throw new Error(
         somDeJanelaConfiavel()
           ? 'Essa escolha veio sem som. Escolha uma aba ou a janela do aplicativo e marque "Compartilhar o áudio".'
-          : 'Essa escolha veio sem som. Escolha uma aba e marque "Compartilhar o áudio da guia".'
+          : 'Essa escolha veio sem som. Escolha uma aba e marque "Compartilhar o áudio da guia".',
       );
     }
 
@@ -342,7 +343,7 @@ export function createBroadcaster({
       throw new Error(
         superficie === 'window'
           ? 'Este navegador não isola o som por janela. Escolha uma aba.'
-          : 'Tela inteira traria o Discord junto e a call se ouviria. Escolha uma aba ou a janela do aplicativo.'
+          : 'Tela inteira traria o Discord junto e a call se ouviria. Escolha uma aba ou a janela do aplicativo.',
       );
     }
 
@@ -353,7 +354,9 @@ export function createBroadcaster({
     if (audioEncoder?.state === 'configured') {
       try {
         audioEncoder.close();
-      } catch {}
+      } catch {
+        // Fechar o que já se fechou sozinho lança; não há nada a desfazer.
+      }
     }
     audioEncoder = null;
 
@@ -385,7 +388,12 @@ export function createBroadcaster({
         // Som é acessório: se o encoder cair, a tela continua no ar.
         error: (err) => console.warn('[audio encoder]', err.message),
       });
-      audioEncoder.configure({ codec: 'opus', sampleRate, numberOfChannels, bitrate: AUDIO_BITRATE });
+      audioEncoder.configure({
+        codec: 'opus',
+        sampleRate,
+        numberOfChannels,
+        bitrate: AUDIO_BITRATE,
+      });
     } catch (err) {
       console.warn('[audio encoder]', err.message);
       audioEncoder = null;
@@ -394,7 +402,10 @@ export function createBroadcaster({
 
     // O mesmo caminho do vídeo: quem chega depois recebe isto ao pedir a tela.
     ws?.send(
-      JSON.stringify({ type: 'audio-config', config: { codec: 'opus', sampleRate, numberOfChannels } })
+      JSON.stringify({
+        type: 'audio-config',
+        config: { codec: 'opus', sampleRate, numberOfChannels },
+      }),
     );
 
     audioReader = new MediaStreamTrackProcessor({ track }).readable.getReader();
@@ -615,7 +626,7 @@ export function createBroadcaster({
     const buf = empacotar(
       chunk.type === 'key' ? TIPO_KEYFRAME : TIPO_DELTA,
       chunk.timestamp ?? 0,
-      data
+      data,
     );
     ws.send(buf);
     bytes += buf.byteLength;
@@ -643,7 +654,7 @@ export function createBroadcaster({
     const out = { codec: dc.codec, codedWidth: dc.codedWidth, codedHeight: dc.codedHeight };
     if (dc.description) {
       const b = new Uint8Array(
-        dc.description instanceof ArrayBuffer ? dc.description : dc.description.buffer
+        dc.description instanceof ArrayBuffer ? dc.description : dc.description.buffer,
       );
       let bin = '';
       for (const x of b) bin += String.fromCharCode(x);
@@ -794,7 +805,9 @@ export function createBroadcaster({
       if (e?.state === 'configured') {
         try {
           e.close();
-        } catch {}
+        } catch {
+          // Fechar o que já se fechou sozinho lança; não há nada a desfazer.
+        }
       }
     }
     encoder = null;
