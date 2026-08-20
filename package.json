@@ -19,6 +19,9 @@
     "build": "npm -w client run build",
     "smoke": "node scripts/smoke.mjs",
     "smoke:admin": "node scripts/admin-smoke.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{js,mjs,json,yml,yaml}\"",
@@ -26,10 +29,13 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^4.1.11",
     "concurrently": "^9.1.2",
     "eslint": "^10.8.1",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.11.0",
-    "prettier": "^3.9.6"
+    "jsdom": "^30.0.1",
+    "prettier": "^3.9.6",
+    "vitest": "^4.1.11"
   }
 }

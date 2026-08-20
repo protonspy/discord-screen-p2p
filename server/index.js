@@ -930,6 +930,11 @@ const heartbeat = setInterval(() => {
   }
 }, 15_000);
 
+// unref para o intervalo nao segurar o processo de pe sozinho: quem mantem o
+// programa vivo e a porta escutando, e quando ela fecha nao ha mais socket
+// para vigiar.
+heartbeat.unref?.();
+
 wss.on('connection', (ws) => {
   ws.__alive = true;
   ws.on('pong', () => {
@@ -1040,3 +1045,11 @@ server.listen(PORT, () => {
 
   console.log('');
 });
+
+/**
+ * Publicado para o teste, que importa o servidor no proprio processo em vez de
+ * gerar outro: so assim a cobertura enxerga as linhas que rodaram. Com PORT=0
+ * o sistema escolhe uma porta livre, e o endereco real sai de
+ * `server.address()` — nada aqui precisa saber que esta sob teste.
+ */
+export { app, server, wss };
