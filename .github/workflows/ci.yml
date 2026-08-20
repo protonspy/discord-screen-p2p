@@ -84,7 +84,7 @@ jobs:
           [ -f server.pid ] && kill "$(cat server.pid)" || true
           [ -f server.log ] && cat server.log || true
 
-  cobertura:
+  coverage:
     # A medida em um sistema só, de propósito: o piso é um número, e dois
     # sistemas medindo o mesmo código dão números levemente diferentes — o
     # `server/system.js` lê /proc onde ele existe. Duas medidas seriam duas
@@ -102,7 +102,7 @@ jobs:
         run: npm run build
       # O piso de 86% mora no vitest.config.js; aqui só se roda a medida. Abaixo
       # dele o vitest sai diferente de zero, e o PR fica vermelho.
-      - name: Cobertura
+      - name: Coverage
         run: npm run coverage
 
   docker:
